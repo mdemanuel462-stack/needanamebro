@@ -1,0 +1,12 @@
+node_modules/
+.env
+npm-debug.log
+package-lock.json
+
+# Termux
+.npm/
+.bash_history
+.config/
+
+# Logs
+*.log

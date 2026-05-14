@@ -1,0 +1,146 @@
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const fs = require('fs');
+
+let kissCount = {};
+let globalKisses = 0;
+
+if (fs.existsSync('./kisses.json')) {
+  try {
+    kissCount = JSON.parse(fs.readFileSync('./kisses.json', 'utf8')) || {};
+  } catch {
+    kissCount = {};
+  }
+}
+
+if (fs.existsSync('./globalKisses.json')) {
+  try {
+    const data = JSON.parse(fs.readFileSync('./globalKisses.json', 'utf8'));
+    globalKisses = data.total || 0;
+  } catch {
+    globalKisses = 0;
+  }
+}
+
+function save() {
+  fs.writeFileSync('./kisses.json', JSON.stringify(kissCount, null, 2));
+  fs.writeFileSync('./globalKisses.json', JSON.stringify({ total: globalKisses }, null, 2));
+}
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('kiss')
+    .setDescription('Besa a alguien')
+    .addUserOption(opt =>
+      opt.setName('usuario')
+        .setDescription('Usuario a besar')
+        .setRequired(true)
+    ),
+
+  async execute(interaction) {
+
+    const user = interaction.options.getUser('usuario');
+
+    if (user.id === interaction.user.id) {
+      return interaction.reply({
+        content: 'No puedes besarte a ti mismo...',
+        ephemeral: true
+      });
+    }
+
+    const key = [interaction.user.id, user.id].sort().join('-');
+
+    if (typeof kissCount[key] !== 'number') {
+      kissCount[key] = 0;
+    }
+
+    kissCount[key]++;
+    globalKisses++;
+
+    save();
+
+    const gifs = [
+      "https://plain-enam-prod-public.komododecks.com/202605/01/C0lkv6gJYolRI9jyDAf6/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/MmO3UDD7ZW3HJw0K6Eub/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/XXBCR6yq4cLpg75NI83h/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/iXoz7YnWHB4Wx6qME9yL/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/K8wyJhTG2jJI9T4c8X5Y/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/K8wyJhTG2jJI9T4c8X5Y/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/ArEJywganAJ1Cj62nZuk/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/XHHbz7ScgNBrkc9bHpLR/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/XyMBLQKoyzhS2zHB1HiQ/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/1MA2UiP5plQxURRlXr7e/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/qNSqBz1VVbNJnX0j51Hf/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/bofUNmPXS57nKvCVSrdF/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/30Mz7xiPrQ0O0LwJXFjF/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/ttZ79arN0T80Ff3D75TG/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/8TWt8Hyd5ri45cwUiepG/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/SzG4cUfWTxhJJCqvfUY0/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/sO2AQzkWfIBXKvEQP6w4/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/C02plW0h6xoN83wvmVCx/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/MvOxR6NBgHkza69HKxYC/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/VCmY1rtuVkg9x1Wdjt2C/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/tQJJHPqhGDlst5LpQwyk/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/7u5Z7sRmoFoMiudvkYjF/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/8MlEql3I0CgCKWthXh27/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/OIibXsmcW9so35ohly1l/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/yEuREF759X1h9oiTm6F2/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/mINu0EUPJZtVd2YpOnXD/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/BGfNEXjOHOZ24RcmWA91/image.gif",
+
+"https://plain-enam-prod-public.komododecks.com/202605/01/P0vWvzawI0ldfEshAFfU/image.gif"
+
+    ];
+
+    const textos = [
+      "besa a",
+      "le da un beso a"
+    ];
+
+    const randomGif = gifs[Math.floor(Math.random() * gifs.length)];
+    const textoRandom = textos[Math.floor(Math.random() * textos.length)];
+
+    const member1 = interaction.member;
+    const member2 = interaction.guild.members.cache.get(user.id);
+
+    const name1 = member1?.displayName || interaction.user.username;
+    const name2 = member2?.displayName || user.username;
+
+    const embed = new EmbedBuilder()
+      .setColor('#FFBA4F')
+      .setDescription(
+`${interaction.user} ${textoRandom} ${user}
+*${name1} y ${name2} se han besado ${kissCount[key]} veces.*`
+      )
+      .setImage(randomGif)
+      .setFooter({ text: `Total global: ${globalKisses}` })
+      .setTimestamp();
+
+    await interaction.reply({ embeds: [embed] });
+  }
+};
