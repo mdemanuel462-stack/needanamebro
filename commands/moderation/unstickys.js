@@ -1,65 +1,114 @@
-const { PermissionsBitField, EmbedBuilder } = require('discord.js');
+const {
+  SlashCommandBuilder,
+  PermissionsBitField,
+  EmbedBuilder
+} = require('discord.js');
+
 const sticky = require('../../handlers/sticky');
 
 module.exports = {
+
+  data: new SlashCommandBuilder()
+    .setName('unstickys')
+    .setDescription('Eliminar un sticky')
+    .addIntegerOption(option =>
+      option
+        .setName('numero')
+        .setDescription('Número del sticky')
+        .setRequired(true)
+    ),
+
   name: 'unstickys',
 
-  async execute(message, args) {
+  async execute(ctx, args) {
 
-    if (!message.guild) return;
+    if (!ctx.guild) return;
 
-    if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-      return message.channel.send({
+    if (
+      !ctx.member.permissions.has(
+        PermissionsBitField.Flags.ManageMessages
+      )
+    ) {
+
+      return ctx.reply({
         embeds: [
           new EmbedBuilder()
             .setColor('#FFBA4F')
-            .setDescription('❌ No tienes permisos')
+            .setDescription(
+              '❌ No tienes permisos'
+            )
         ]
       });
     }
 
-    const g = message.guild.id;
-    const c = message.channel.id;
+    const g = ctx.guild.id;
+    const c = ctx.channel.id;
 
-    const index = parseInt(args[0]) - 1;
+    const data =
+      sticky.data[g]?.[c];
 
-    if (isNaN(index)) {
-      return message.channel.send({
+    if (!data || data.length === 0) {
+
+      return ctx.reply({
         embeds: [
           new EmbedBuilder()
             .setColor('#FFBA4F')
-            .setDescription('❌ Debes poner un número válido')
+            .setDescription(
+              '❌ No hay stickys'
+            )
         ]
       });
     }
 
-    const data = sticky.data[g]?.[c];
+    let index;
 
-    if (!data || !data[index]) {
-      return message.channel.send({
+    if (ctx.commandName) {
+
+      index =
+        ctx.options.getInteger('numero') - 1;
+    }
+
+    else {
+
+      index =
+        parseInt(args[0]) - 1;
+    }
+
+    if (
+      isNaN(index) ||
+      !data[index]
+    ) {
+
+      return ctx.reply({
         embeds: [
           new EmbedBuilder()
             .setColor('#FFBA4F')
-            .setDescription('❌ Sticky no encontrado')
+            .setDescription(
+              '❌ Sticky no encontrado'
+            )
         ]
       });
     }
+
+    const removed =
+      data[index];
 
     data.splice(index, 1);
 
-    if (data.length === 0) {
-      delete sticky.data[g][c];
-    }
-
     sticky.save();
 
-    message.channel.send({
-      embeds: [
-        new EmbedBuilder()
-          .setColor('#FFBA4F')
-          .setDescription('🗑️ Sticky eliminado')
-          .setTimestamp()
-      ]
+    const embed = new EmbedBuilder()
+      .setColor('#FFBA4F')
+      .setTitle('🗑️ Sticky Eliminado')
+      .setDescription(
+`### Sticky eliminado
+
+> ${removed.text}`
+      )
+      .setTimestamp();
+
+    return ctx.reply({
+      embeds: [embed]
     });
   }
 };

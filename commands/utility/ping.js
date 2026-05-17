@@ -1,16 +1,23 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
+
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription('Ver latencia'),
+    .setDescription('Responde pong'),
 
-  async execute(interaction) {
+  name: 'ping',
 
-    const embed = new EmbedBuilder()
-      .setColor('#FFBA4F')
-      .setDescription(`🏓 Pong!\nLatencia: ${Date.now() - interaction.createdTimestamp}ms`);
+  async execute(ctx) {
 
-    await interaction.reply({ embeds: [embed] });
+    if (ctx.reply && ctx.commandName) {
+
+      return ctx.reply('🏓 Pong Slash!');
+    }
+
+    if (ctx.reply && ctx.content) {
+
+      return ctx.reply('🏓 Pong Prefix!');
+    }
   }
 };

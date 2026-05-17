@@ -9,7 +9,9 @@ const folders = fs.readdirSync('./commands');
 
 for (const folder of folders) {
 
-  const files = fs.readdirSync(`./commands/${folder}`).filter(f => f.endsWith('.js'));
+  const files = fs
+    .readdirSync(`./commands/${folder}`)
+    .filter(file => file.endsWith('.js'));
 
   for (const file of files) {
 
@@ -21,24 +23,31 @@ for (const folder of folders) {
   }
 }
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+const rest = new REST({
+  version: '10'
+}).setToken(process.env.TOKEN);
 
 (async () => {
+
   try {
 
-    console.log('🚀 Subiendo comandos...');
+    console.log('🚀 Subiendo slash commands...');
 
     await rest.put(
       Routes.applicationGuildCommands(
         process.env.CLIENT_ID,
         process.env.GUILD_ID
       ),
-      { body: commands }
+      {
+        body: commands
+      }
     );
 
-    console.log('✅ Comandos listos');
+    console.log(`✅ ${commands.length} comandos registrados`);
 
   } catch (error) {
+
+    console.error('❌ Error registrando comandos:');
     console.error(error);
   }
 })();
