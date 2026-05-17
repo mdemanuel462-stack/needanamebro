@@ -1,3 +1,5 @@
+const sticky = require('../handlers/sticky');
+
 const prefix = '!';
 
 module.exports = {
@@ -9,7 +11,83 @@ module.exports = {
 
       if (message.author.bot) return;
 
-      if (!message.content.startsWith(prefix)) return;
+      const guildId =
+        message.guild?.id;
+
+      const channelId =
+        message.channel?.id;
+
+      if (
+        guildId &&
+        channelId &&
+        sticky.data[guildId] &&
+        sticky.data[guildId][channelId]
+      ) {
+
+        const stickies =
+          sticky.data[guildId][channelId];
+
+        for (const s of stickies) {
+
+          try {
+
+            if (
+              message.id === s.lastId
+            ) continue;
+
+            if (s.lastId) {
+
+              const oldMessage =
+                await message.channel.messages
+                  .fetch(s.lastId)
+                  .catch(() => null);
+
+              if (oldMessage) {
+
+                await oldMessage
+                  .delete()
+                  .catch(() => {});
+              }
+            }
+
+            const stickyMessage =
+              await message.channel.send({
+                embeds: [
+                  {
+                    color: 0xFFBA4F,
+                    description:
+                                `📌 **Sticky Message**
+
+                                 ${s.text}`,
+                    footer: {
+                      text:
+                        `Sticky System`
+                    }
+                  }
+                ]
+              });
+
+            s.lastId =
+              stickyMessage.id;
+
+            s.uses =
+              (s.uses || 0) + 1;
+
+          } catch (err) {
+
+            console.error(
+              '❌ Error Sticky:',
+              err
+            );
+          }
+        }
+
+        sticky.save();
+      }
+
+      if (
+        !message.content.startsWith(prefix)
+      ) return;
 
       const args = message.content
         .slice(prefix.length)
@@ -22,7 +100,9 @@ module.exports = {
       if (!commandName) return;
 
       const command =
-        client.commands.get(commandName);
+        client.commands.get(
+          commandName
+        );
 
       if (!command) return;
 
@@ -33,11 +113,10 @@ module.exports = {
 
     } catch (err) {
 
-      console.error(err);
-
-      message.reply(
-        '❌ Ocurrió un error'
-      ).catch(() => {});
+      console.error(
+        '❌ Error messageCreate:',
+        err
+      );
     }
   }
 };

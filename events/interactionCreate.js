@@ -5,12 +5,13 @@ module.exports = {
 
     try {
 
+
       if (interaction.isChatInputCommand()) {
 
-        const command =
-          client.commands.get(
-            interaction.commandName
-          );
+const command =
+  client.commands.get(
+    interaction.commandName
+  );
 
         if (!command) return;
 
@@ -18,6 +19,7 @@ module.exports = {
           interaction
         );
       }
+
 
       if (interaction.isButton()) {
 
@@ -47,14 +49,15 @@ module.exports = {
         }
       }
 
+
       if (interaction.isModalSubmit()) {
 
         return interaction.reply({
-          content:
-            '✅ Modal recibido',
+          content: '✅ Modal recibido',
           ephemeral: true
         });
       }
+
 
       if (
         interaction.isStringSelectMenu()

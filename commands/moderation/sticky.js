@@ -7,10 +7,9 @@ const {
 const sticky = require('../../handlers/sticky');
 
 module.exports = {
-
   data: new SlashCommandBuilder()
     .setName('sticky')
-    .setDescription('Crear un sticky profesional')
+    .setDescription('Crear un sticky')
     .addStringOption(option =>
       option
         .setName('mensaje')
@@ -21,68 +20,48 @@ module.exports = {
   name: 'sticky',
 
   async execute(ctx, args) {
-
-    const guild =
-      ctx.guild;
+    const guild = ctx.guild;
 
     if (!guild) return;
 
-    const member =
-      ctx.member;
-
-    const channel =
-      ctx.channel;
-
-    const user =
-      ctx.user || ctx.author;
-
-    const noPerms = new EmbedBuilder()
-      .setColor('#FFBA4F')
-      .setDescription(
-        '❌ No tienes permisos para usar este comando'
-      );
+    const member = ctx.member;
+    const channel = ctx.channel;
+    const user = ctx.user || ctx.author;
 
     if (
       !member.permissions.has(
         PermissionsBitField.Flags.ManageMessages
       )
     ) {
-
-      if (ctx.commandName) {
-        return ctx.reply({
-          embeds: [noPerms],
-          ephemeral: true
-        });
-      }
-
       return ctx.reply({
-        embeds: [noPerms]
+        embeds: [
+          new EmbedBuilder()
+            .setColor('#2B2D31')
+            .setDescription(
+              '❌ No tienes permisos para usar este comando.'
+            )
+        ],
+        ephemeral: true
       });
     }
 
     let text;
 
-    // Slash
     if (ctx.commandName) {
-
-      text =
-        ctx.options.getString('mensaje');
+      text = ctx.options.getString('mensaje');
     }
 
-    // Prefix
     else {
-
       text = args.join(' ');
     }
 
     if (!text) {
-
       return ctx.reply({
         embeds: [
           new EmbedBuilder()
-            .setColor('#FFBA4F')
+            .setColor('#2B2D31')
             .setDescription(
-              '❌ Debes escribir un mensaje'
+              '❌ Debes escribir un mensaje.'
             )
         ]
       });
@@ -100,13 +79,12 @@ module.exports = {
     }
 
     if (sticky.data[g][c].length >= 5) {
-
       return ctx.reply({
         embeds: [
           new EmbedBuilder()
-            .setColor('#FFBA4F')
+            .setColor('#2B2D31')
             .setDescription(
-              '❌ Máximo 5 stickys por canal'
+              '❌ Solo puedes tener 5 stickys por canal.'
             )
         ]
       });
@@ -122,27 +100,11 @@ module.exports = {
 
     sticky.save();
 
-    const embed = new EmbedBuilder()
+const embed = new EmbedBuilder()
       .setColor('#FFBA4F')
-      .setAuthor({
-        name: 'Sticky System',
-        iconURL: user.displayAvatarURL()
-      })
-      .setTitle('🧷 Sticky Activado')
       .setDescription(
-`### Mensaje Sticky
-
-> ${text}
-
-### Información
-👤 Creador: ${user}
-📍 Canal: ${channel}
-📌 Stickys actuales: ${sticky.data[g][c].length}/5`
-      )
-      .setFooter({
-        text: `Sistema Sticky • ${guild.name}`
-      })
-      .setTimestamp();
+        ` Sticky creado en ${channel}\n\n> ${text}`
+      );
 
     return ctx.reply({
       embeds: [embed]
