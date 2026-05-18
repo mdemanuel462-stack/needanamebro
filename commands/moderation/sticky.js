@@ -78,13 +78,13 @@ module.exports = {
       sticky.data[g][c] = [];
     }
 
-    if (sticky.data[g][c].length >= 5) {
+    if (sticky.data[g][c].length >= 10) {
       return ctx.reply({
         embeds: [
           new EmbedBuilder()
             .setColor('#2B2D31')
             .setDescription(
-              '❌ Solo puedes tener 5 stickys por canal.'
+              '❌ Solo puedes tener 10 stickys por canal.'
             )
         ]
       });

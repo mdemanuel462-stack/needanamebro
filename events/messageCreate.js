@@ -50,22 +50,11 @@ module.exports = {
               }
             }
 
-            const stickyMessage =
+              const stickyMessage =
               await message.channel.send({
-                embeds: [
-                  {
-                    color: 0xFFBA4F,
-                    description:
-                                `📌 **Sticky Message**
+              content: `${s.text}`
+                         });
 
-                                 ${s.text}`,
-                    footer: {
-                      text:
-                        `Sticky System`
-                    }
-                  }
-                ]
-              });
 
             s.lastId =
               stickyMessage.id;
